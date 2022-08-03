@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import React, { useState } from "react";
+import Nav from "./component/Nav";
+import Note from "./component/Note";
+import DisNotes from "./component/DisNotes";
+import { Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+export default function App() {
+  const [notes, setnotes] = useState(getNotes);
+  localStorage.setItem("notes", JSON.stringify(notes));
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <>
+      <Nav />
 
-export default App;
+      <BrowserRouter>
+        <Routes>
+          <Route
+            path="/"
+            element={<Note notes={notes} setnotes={setnotes} />}
+          />
+          <Route
+            path="edit/:id"
+            element={<Note notes={notes} setnotes={setnotes} />}
+          />
+        </Routes>
+
+        <div className="container">
+          <div className="row justify-contain-center">
+            <div className="col-md-10">
+              <h1 className="mb-3"> Notes </h1>{" "}
+              {notes.length === 0 ? (
+                <div className="card-body">
+                  <h5 className="card-title"> Message </h5>{" "}
+                  <p className="card-text"> Please add some of your notes </p>
+                </div>
+              ) : (
+                notes.map((element) => {
+                  return (
+                    <DisNotes
+                      element={element}
+                      key={element.id}
+                      notes={notes}
+                      setnotes={setnotes}
+                    />
+                  );
+                })
+              )}
+            </div>{" "}
+          </div>{" "}
+        </div>
+      </BrowserRouter>
+    </>
+  );
+
+  function getNotes() {
+    const note = JSON.parse(localStorage.getItem("notes"));
+    if (note) {
+      return note;
+    } else {
+      return [];
+    }
+  }
+}
